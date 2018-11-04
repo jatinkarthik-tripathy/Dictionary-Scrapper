@@ -3,12 +3,14 @@ import requests
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import string
-
+from word_class import word_details
+import io
 
 words = []
+words_objs = []
 
 def word_gen(words):
-    letters = string.ascii_lowercase[:5]
+    letters = string.ascii_lowercase[0:]
     print(letters)
 
     driver = webdriver.Chrome('chromedriver.exe')
@@ -33,8 +35,9 @@ def word_gen(words):
             words.append(word.text)
 
     print(words)
+    driver.close()
 
-def parser(url):
+def parser(url, words_objs):
     sauce = requests.get(url)
     plaintxt = sauce.text
     soup = BeautifulSoup(plaintxt, 'html.parser')
@@ -43,25 +46,35 @@ def parser(url):
     print(name)
 
     pos = soup.find('div', {'class':'row entry-header'}).find('span').text
-    print(pos)
+    # print(pos)
 
     prounciation = soup.find('span', {'class':'pr'}).text
-    print(prounciation)
+    # print(prounciation)
 
     defi = soup.find('span', {'class':'dtText'}).text
-    print(defi)
-    
+    # print(defi)
 
-
+    wrd = word_details(name, pos, prounciation, defi)
+    words_objs.append(wrd)
 
 
 def run():
-    # url = 'https://www.merriam-webster.com/dictionary/assignment'
-    # parser(url)
+    word_gen(words)
+    for word in words:
+        url = 'https://www.merriam-webster.com/dictionary/' + word
+        parser(url, words_objs)
 
-
-
-
+    with io.open("DB.txt", "w+", encoding='utf8') as f:
+        for word in words_objs:
+            f.write(word.word)
+            f.write("\n")
+            f.write(word.pos)
+            f.writelines("\n")
+            f.write(word.prounciation)
+            f.write("\n")
+            f.write(word.defi)
+            f.write("\n")
+            f.write("\n")
 
 if __name__ == '__main__':
     run()
