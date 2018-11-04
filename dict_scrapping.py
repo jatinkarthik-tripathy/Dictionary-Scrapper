@@ -50,6 +50,7 @@ def parser(url):
 
     defi = soup.find('span', {'class':'dtText'}).text
     print(defi)
+    
 
 
 
@@ -58,7 +59,7 @@ def run():
     # url = 'https://www.merriam-webster.com/dictionary/assignment'
     # parser(url)
 
-    
+
 
 
 
